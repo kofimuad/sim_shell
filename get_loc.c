@@ -1,53 +1,33 @@
 #include "main.h"
-
+/**
+ * get_loc - gets location of exec. file
+ * @command: command to execute
+ * Return: string - (the location)
+ */
 char *get_loc(char *command)
 {
-	char *path, *path_cp, *file_path, *path_token;
-	int cmd_len, dir_len;
-	struct stat buffer;
+	char *path = getenv("PATH"), *path_cp, *token, *cmd_path;
+	struct stat st;
 
-	path = getenv("PATH");
+	path_cp = strdup(path);
 
-	if (path)
+	if (!path || !(path_cp))
+		return (NULL);
+
+	for (token = strtok(path_cp, ":"); token; token = strtok(NULL, ":"))
 	{
-		path_cp = strdup(path);
-
-		cmd_len = strlen(command);
-
-		path_token = strtok(path_cp, ":");
-
-		while (path_token != NULL)
+		cmd_path = malloc(strlen(token) + strlen(command) + 2);
+		if (cmd_path)
 		{
-			dir_len = strlen(path_token);
-
-			file_path = malloc(dir_len + cmd_len + 2);
-
-			strcpy(file_path, path_token);
-			strcat(file_path, "/");
-			strcat(file_path, command);
-			strcat(file_path, "\0");
-
-			if (stat(file_path, &buffer) == 0)
+			sprintf(cmd_path, "%s/%s", token, command);
+			if (stat(cmd_path, &st) == 0)/* Command Found*/
 			{
 				free(path_cp);
-
-				return (file_path);
+				return (cmd_path);
 			}
-			else
-			{
-				free(file_path);
-
-				path_token = strtok(NULL, ":");
-			}
+			free(cmd_path);
 		}
-
-		free(path_cp);
-
-		if (stat(command, &buffer) == 0)
-			return (command);
-
-		return (NULL);
 	}
-
+	free(path_cp);
 	return (NULL);
 }
