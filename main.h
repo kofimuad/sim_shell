@@ -15,5 +15,8 @@ char *strtok(char *str, const char *delim);
 void execmd(char **argv);
 char *get_loc(char *command);
 char *strdup(const char *s);
+ssize_t read_cmd(char **lineptr, size_t *n);
+char *parse_cmd(char *lineptr);
+void exec_cmd(char *command);
 
 #endif
